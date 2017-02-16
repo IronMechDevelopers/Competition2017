@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.command.Command;
 public class DriveTrain extends Subsystem {
 	// Subsystem devices
 	private static RobotDrive drive;
+	public static int forward =1;
 	//private AnalogGyro gyro = Robot.myGyro;
 
 	public DriveTrain() {
@@ -53,7 +54,15 @@ public class DriveTrain extends Subsystem {
 	}
 	
 	public void arcadeDrive(Joystick joy) {
-		drive.arcadeDrive(joy.getRawAxis(5),-1*joy.getRawAxis(4),true);
+		drive.arcadeDrive(forward*joy.getRawAxis(5),-1*forward*joy.getRawAxis(4),true);
+	}
+	
+	public void switchForward()
+	{
+		if(forward==1)
+			forward=-1;
+		else
+			forward=1;
 	}
 
 	/**

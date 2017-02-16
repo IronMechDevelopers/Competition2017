@@ -10,11 +10,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  */
 public class Climb extends Command {
-
-    public Climb() {
+	private double speed;
+	public static double SLOWSPEEDCLIMB=.25;
+	public static double FASTSPEEDCLIMB=.5;
+	public static double FASTSPEEDLOWER=-.5;
+	public static double SLOWSPEEDLOWER=-.25;
+    public Climb(double speed) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.climber);
+    	this.speed=speed;
     }
 
     // Called just before this Command runs the first time
@@ -22,10 +27,11 @@ public class Climb extends Command {
     }
 
     // Called repeatedly when this Command is scheduled to run
+    /**
+     * A positive number will cause the climber to climb up the rope
+     */
     protected void execute() {
-    	double speed = SmartDashboard.getNumber(RobotMap.climbSlider, 2.5);
-		Robot.climber.setSpeed(-1*(2.0/5*speed-1));
-		SmartDashboard.putNumber("climber Speed", speed);
+    	Robot.climber.setSpeed(-1.0*speed);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -35,11 +41,12 @@ public class Climb extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+    	Robot.climber.stop();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	Robot.climber.stop();
+    	end();
     }
 }

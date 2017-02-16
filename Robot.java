@@ -27,19 +27,17 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team5684.robot.commands.Climb;
+import org.usfirst.frc.team5684.robot.commands.Collect;
 import org.usfirst.frc.team5684.robot.commands.DriveStraight;
 import org.usfirst.frc.team5684.robot.commands.LowerArm;
 import org.usfirst.frc.team5684.robot.commands.Shoot;
-import org.usfirst.frc.team5684.robot.commands.StartShooter;
 import org.usfirst.frc.team5684.robot.commands.Startup;
-import org.usfirst.frc.team5684.robot.commands.TestShooter;
 import org.usfirst.frc.team5684.robot.subsystems.Arm;
 import org.usfirst.frc.team5684.robot.subsystems.CamMount;
 import org.usfirst.frc.team5684.robot.subsystems.CenterPeg;
 import org.usfirst.frc.team5684.robot.subsystems.Climber;
 import org.usfirst.frc.team5684.robot.subsystems.Collector;
 import org.usfirst.frc.team5684.robot.subsystems.DriveTrain;
-import org.usfirst.frc.team5684.robot.subsystems.ExampleSubsystem;
 import org.usfirst.frc.team5684.robot.subsystems.Shooter;
 import org.usfirst.frc.team5684.robot.subsystems.Turn;
 
@@ -56,6 +54,7 @@ public class Robot extends IterativeRobot {
 	public static OI oi;
 	public static DriveTrain drivetrain = new DriveTrain();
 	public static AnalogGyro myGyro;
+	public static Ultrasonic myProxSensor; // SCOTT HOWARD - declaring the sensor
 	public static double voltsPerDegreePerSecond = 0.0012;
 	public static final int IMG_WIDTH = 640;
 	public static final int IMG_HEIGHT = 480;
@@ -71,7 +70,7 @@ public class Robot extends IterativeRobot {
 	public static CamMount camMount;
 	public static CenterPeg centerPeg;
 	public static boolean showNomral;
-	public static StartShooter s;
+	//public static StartShoot s;
 
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
@@ -85,6 +84,14 @@ public class Robot extends IterativeRobot {
 		showNomral=true;
 		myGyro = new AnalogGyro(RobotMap.gyro);
 		
+		// SCOTT HOWARD - parameters will need to be adjusted. Parameters are (echo pulse, trigger pulse)
+		// So, this example uses DigitalOutput 0 as the echo pulse, and DigitalInput 0 for the trigger pulse
+		// I'm not sure what specific ports you'll be using, so I put 0's in for place-holders
+//		myProxSensor = new Ultrasonic(0, 0);
+		// SCOTT HOWARD - this function call simply reads the range on the sensor. Maybe print this to the screen?
+		// According to FRC, accuracy should be within 2-3 inches. Just not sure on specific numbers for the Pololu sensor.
+//		double range = myProxSensor.getRangeInches();
+		
 		myGyro.reset();
 		myGyro.setSensitivity(voltsPerDegreePerSecond);
 		myGyro.calibrate();
@@ -96,12 +103,19 @@ public class Robot extends IterativeRobot {
 		centerPeg = new CenterPeg();
 		oi = new OI();
 		
-		chooser.addDefault("Test Shooter",new TestShooter());
+		chooser.addDefault("Startup",new Startup());
 		chooser.addObject("Drive Forward", new DriveStraight());
-		//chooser.addObject("Climb", new Climb());
-		
-		
+		chooser.addObject("Climb", new Climb(.25));
 		SmartDashboard.putData("Auto mode", chooser);
+		SmartDashboard.putData("climb slow",new Climb(Climb.SLOWSPEEDCLIMB));
+		SmartDashboard.putData("climb fast",new Climb(Climb.FASTSPEEDCLIMB));
+		SmartDashboard.putData("lower slow",new Climb(Climb.SLOWSPEEDLOWER));
+		SmartDashboard.putData("lower fast",new Climb(Climb.FASTSPEEDLOWER));
+		SmartDashboard.putData("Drive Forward",new DriveStraight());
+		SmartDashboard.putData("Shoot",new Shoot());
+		SmartDashboard.putData("Collect In",new Collect(Collect.FORWARD));
+		SmartDashboard.putData("Collect Out",new Collect(Collect.BACKWARD));
+		
 		
 		/*
 		 * camera error code
@@ -305,11 +319,19 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {		
 		System.out.println("chooser: "+ chooser);
 		System.out.println("command: " + chooser.getSelected());
-		s = new StartShooter();
-		s.initialize();
-		s.execute();
 		autonomousCommand = chooser.getSelected();
 		System.out.println("command: " + autonomousCommand);
+		
+		/* SCOTT HOWARD
+		int command = 0;
+		switch(command) {
+		
+		 // Switch on different integers for each command (StartShooter, Collect, etc...)
+		 // Up to you guys on what case you want to be which command
+		 // This might be where you can set the 4 bits for each option (1000, 0001, 1101, etc...)
+		
+		}
+		*/
 		
 		
 		/*
@@ -322,6 +344,7 @@ public class Robot extends IterativeRobot {
 		// schedule the autonomous command (example)
 		if (autonomousCommand != null)
 		{
+			autonomousCommand.start();
 			System.out.println("\t We got inside");
 			
 		}
@@ -332,20 +355,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		if(s.isFinished())
-		{
-			s.end();
-		}
-		
-		if (autonomousCommand != null) {
-			autonomousCommand.cancel();
-		}
+		Scheduler.getInstance().run();
 		
 	}
 
 	@Override
 	public void teleopInit() {
-		Startup start = new Startup();
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove

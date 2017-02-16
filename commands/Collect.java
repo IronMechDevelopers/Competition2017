@@ -10,11 +10,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  */
 public class Collect extends Command {
-
-    public Collect() {
+	
+	public static int FORWARD = 1;
+	public static int BACKWARD = -1;
+	int direction;
+	
+    public Collect(int direction) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.collector);
+    	this.direction=direction;
     }
 
     // Called just before this Command runs the first time
@@ -24,7 +29,8 @@ public class Collect extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	double speed = SmartDashboard.getNumber(RobotMap.collectorSlider, 2.5);
-		Robot.collector.setSpeed(2.0/5*speed-1);
+    	System.out.println("Speed: " + speed);
+		Robot.collector.setSpeed(speed/5.0*direction);
 		SmartDashboard.putNumber("collector Speed", speed);
     	
     }

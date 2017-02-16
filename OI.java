@@ -10,8 +10,11 @@ import org.usfirst.frc.team5684.robot.commands.IRSensor;
 import org.usfirst.frc.team5684.robot.commands.LowerArm;
 import org.usfirst.frc.team5684.robot.commands.RaiseArm;
 import org.usfirst.frc.team5684.robot.commands.Shoot;
-import org.usfirst.frc.team5684.robot.commands.StartShooter;
+import org.usfirst.frc.team5684.robot.commands.SwitchForward;
 import org.usfirst.frc.team5684.robot.commands.ZeroCamera;
+import org.usfirst.frc.team5684.robot.triggers.LeftSideTriggers;
+import org.usfirst.frc.team5684.robot.triggers.LeftTrigger;
+import org.usfirst.frc.team5684.robot.triggers.RightTrigger;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
@@ -36,7 +39,10 @@ public class OI {
 	 Button bButton = new JoystickButton(joystick,2);
 	 Button rightShoulderButton = new JoystickButton(joystick,6);
 	 Button leftShoulderButton = new JoystickButton(joystick,5);
-	 Button rightStickIn = new JoystickButton(joystick,9);
+	 Button leftStickIn = new JoystickButton(joystick,9);
+	 RightTrigger rightTrigger = new RightTrigger();
+	 LeftTrigger leftTrigger = new LeftTrigger();
+	 LeftSideTriggers leftSideTriggers = new LeftSideTriggers();
 
 	// There are a few additional built in buttons you can use. Additionally,
 	// by subclassing Button you can create custom triggers and bind those to
@@ -60,12 +66,17 @@ public class OI {
 	 
 		public OI() {
 			aButton.whileHeld(new RaiseArm());
-			bButton.whileHeld(new ZeroCamera());
-			xButton.whenPressed(new StartShooter());
-			yButton.whenPressed(new Camera());
-			rightShoulderButton.whileHeld(new Climb());
-			leftShoulderButton.whileHeld(new Collect());
-			rightStickIn.whenPressed(new StartShooter());
+			bButton.whileHeld(new LowerArm());
+			xButton.whileHeld(new Shoot());
+			
+			leftShoulderButton.whileHeld(new Climb(Climb.SLOWSPEEDCLIMB));
+			leftTrigger.whileActive(new Climb(Climb.FASTSPEEDCLIMB));
+			bButton.whileHeld(new Climb(Climb.SLOWSPEEDLOWER));
+			
+			rightTrigger.whileActive(new Collect(Collect.FORWARD));
+			rightShoulderButton.whileHeld(new Collect(Collect.BACKWARD));
+			
+			leftStickIn.whenPressed(new SwitchForward());
 			
 			/*
 			 * xButton on/off for shooter
