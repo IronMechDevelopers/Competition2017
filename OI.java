@@ -1,24 +1,36 @@
 package org.usfirst.frc.team5684.robot;
 
+import org.usfirst.frc.team5684.robot.commands.Agitate;
+import org.usfirst.frc.team5684.robot.commands.AutoForward;
+import org.usfirst.frc.team5684.robot.commands.AutoPlacePegAndRed;
+import org.usfirst.frc.team5684.robot.commands.AutoPlacePegAndStop;
 import org.usfirst.frc.team5684.robot.commands.Camera;
 import org.usfirst.frc.team5684.robot.commands.Climb;
+import org.usfirst.frc.team5684.robot.commands.ClimbFaster;
 import org.usfirst.frc.team5684.robot.commands.Collect;
+import org.usfirst.frc.team5684.robot.commands.DecreaseShooterSpeed;
 import org.usfirst.frc.team5684.robot.commands.DriveStraight;
+import org.usfirst.frc.team5684.robot.commands.Everything;
 import org.usfirst.frc.team5684.robot.commands.Flip;
 import org.usfirst.frc.team5684.robot.commands.FollowPeg;
 import org.usfirst.frc.team5684.robot.commands.IRSensor;
+import org.usfirst.frc.team5684.robot.commands.IncreaseShooterSpeed;
 import org.usfirst.frc.team5684.robot.commands.LowerArm;
 import org.usfirst.frc.team5684.robot.commands.RaiseArm;
 import org.usfirst.frc.team5684.robot.commands.Shoot;
+import org.usfirst.frc.team5684.robot.commands.ShootWithAgitate;
+import org.usfirst.frc.team5684.robot.commands.Square;
 import org.usfirst.frc.team5684.robot.commands.SwitchForward;
 import org.usfirst.frc.team5684.robot.commands.ZeroCamera;
-import org.usfirst.frc.team5684.robot.triggers.LeftSideTriggers;
-import org.usfirst.frc.team5684.robot.triggers.LeftTrigger;
+import org.usfirst.frc.team5684.robot.triggers.BackwardButton;
+import org.usfirst.frc.team5684.robot.triggers.ForwardButton;
 import org.usfirst.frc.team5684.robot.triggers.RightTrigger;
+import org.usfirst.frc.team5684.robot.triggers.BothTriggers;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
@@ -33,16 +45,33 @@ public class OI {
 	// You create one by telling it which joystick it's on and which button
 	// number it is.
 	 Joystick joystick = new Joystick(0);
-	 Button aButton = new JoystickButton(joystick,1);
-	 Button xButton = new JoystickButton(joystick,3);
-	 Button yButton = new JoystickButton(joystick,4);
-	 Button bButton = new JoystickButton(joystick,2);
-	 Button rightShoulderButton = new JoystickButton(joystick,6);
-	 Button leftShoulderButton = new JoystickButton(joystick,5);
-	 Button leftStickIn = new JoystickButton(joystick,9);
-	 RightTrigger rightTrigger = new RightTrigger();
-	 LeftTrigger leftTrigger = new LeftTrigger();
-	 LeftSideTriggers leftSideTriggers = new LeftSideTriggers();
+	 Button xButton = new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.xButton);
+	 Button xBackButton = new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.xButton);
+	 
+	 Button yButton = new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.yButton);
+	 Button yBackButton = new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.yButton);
+	 
+	 Button bButton = new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.bButton);
+	 Button bBackButton = new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.bButton);
+	 
+	 Button aButton = new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.aButton);
+	 Button aBackButton = new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.aButton);
+	 
+	 Button rightBumper= new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.rightBumper);
+	 Button rightBackBumper= new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.rightBumper);
+	 
+	 Button leftBumper= new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.leftBumper);
+	 Button leftBackBumper= new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.leftBumper);
+	 
+	 Button RightTrigger = new RightTrigger(joystick);
+	 Button BothTriggers = new BothTriggers(joystick);
+	 
+	 
+	
+	 
+	 //To control speed of collector
+	 //Button backButton = new JoystickButton(joystick,10);	//Not sure value 10 is correct
+	 
 
 	// There are a few additional built in buttons you can use. Additionally,
 	// by subclassing Button you can create custom triggers and bind those to
@@ -65,45 +94,33 @@ public class OI {
 	// button.whenReleased(new ExampleCommand());
 	 
 		public OI() {
-			aButton.whileHeld(new RaiseArm());
-			bButton.whileHeld(new LowerArm());
-			xButton.whileHeld(new Shoot());
 			
-			leftShoulderButton.whileHeld(new Climb(Climb.SLOWSPEEDCLIMB));
-			leftTrigger.whileActive(new Climb(Climb.FASTSPEEDCLIMB));
+			
+			xButton.whileHeld(new ShootWithAgitate());
+			xBackButton.whileHeld(new Shoot(Shoot.BACKWARD));
+			
+			aButton.whileHeld(new DriveStraight());
+			aBackButton.whenPressed(new Square());
+			
+			
+			leftBumper.whileHeld(new Agitate(Agitate.FORWARD));
+			leftBackBumper.whileHeld(new Agitate(Agitate.BACKWARD));
+			
+			rightBumper.whileHeld(new Collect(Collect.FORWARD));
+			rightBackBumper.whileHeld(new Collect(Collect.BACKWARD));
+			
+			yButton.whenPressed(new IncreaseShooterSpeed());
+			yBackButton.whenPressed(new DecreaseShooterSpeed());
+			
+			RightTrigger.whileHeld(new Climb(Climb.SLOWSPEEDCLIMB));
 			bButton.whileHeld(new Climb(Climb.SLOWSPEEDLOWER));
+			BothTriggers.whileHeld(new ClimbFaster());
 			
-			rightTrigger.whileActive(new Collect(Collect.FORWARD));
-			rightShoulderButton.whileHeld(new Collect(Collect.BACKWARD));
 			
-			leftStickIn.whenPressed(new SwitchForward());
-			
-			/*
-			 * xButton on/off for shooter
-			 * right Trigger ground collector suck in balls
-			 * left Trigger ground collector spit balls out
-			 *  Right Bumper slow climb
-			 *  left bunmper medium climb
-			 *  both bumpers fast climb
-			 */
-			
-			/*
-			 * xButton on/off for shooter
-			 * a Button ground collector suck in balls
-			 * b Button ground collector spit balls out
-			 *  Right Bumper slow climb
-			 *  left bunmper medium climb
-			 *  both bumpers fast climb
-			 */
-			
-			/*
-			 * left joystick drives
-			 * left trigger collector with y button tuggles direction
-			 * right trigger climber with b button tuggles speed contorl by either B or right joystick
-			 * shooting is x while pressed
-			 *  Left trigger change what is forwards
-			 * 
-			 */
+			/*aButton.whenPressed(new AutoForward());
+			xButton.whenPressed(new AutoPlacePegAndStop());
+			yButton.whenPressed(new AutoPlacePegAndRed());
+			*/
 			
 		}
 		

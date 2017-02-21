@@ -6,6 +6,7 @@ import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.command.Command;
@@ -26,17 +27,25 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.usfirst.frc.team5684.robot.commands.Agitate;
+import org.usfirst.frc.team5684.robot.commands.AutoForward;
+import org.usfirst.frc.team5684.robot.commands.AutoPlacePegAndStop;
 import org.usfirst.frc.team5684.robot.commands.Climb;
 import org.usfirst.frc.team5684.robot.commands.Collect;
 import org.usfirst.frc.team5684.robot.commands.DriveStraight;
 import org.usfirst.frc.team5684.robot.commands.LowerArm;
+import org.usfirst.frc.team5684.robot.commands.RaiseArm;
 import org.usfirst.frc.team5684.robot.commands.Shoot;
+import org.usfirst.frc.team5684.robot.commands.Square;
 import org.usfirst.frc.team5684.robot.commands.Startup;
+import org.usfirst.frc.team5684.robot.subsystems.Agitator;
 import org.usfirst.frc.team5684.robot.subsystems.Arm;
 import org.usfirst.frc.team5684.robot.subsystems.CamMount;
 import org.usfirst.frc.team5684.robot.subsystems.CenterPeg;
 import org.usfirst.frc.team5684.robot.subsystems.Climber;
 import org.usfirst.frc.team5684.robot.subsystems.Collector;
+import org.usfirst.frc.team5684.robot.subsystems.DriveStraightBackwardsPID;
+import org.usfirst.frc.team5684.robot.subsystems.DriveStraightPID;
 import org.usfirst.frc.team5684.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team5684.robot.subsystems.Shooter;
 import org.usfirst.frc.team5684.robot.subsystems.Turn;
@@ -53,7 +62,6 @@ public class Robot extends IterativeRobot {
 	public static final Arm arm = new Arm();
 	public static OI oi;
 	public static DriveTrain drivetrain = new DriveTrain();
-	public static AnalogGyro myGyro;
 	public static Ultrasonic myProxSensor; // SCOTT HOWARD - declaring the sensor
 	public static double voltsPerDegreePerSecond = 0.0012;
 	public static final int IMG_WIDTH = 640;
@@ -70,7 +78,12 @@ public class Robot extends IterativeRobot {
 	public static CamMount camMount;
 	public static CenterPeg centerPeg;
 	public static boolean showNomral;
-	//public static StartShoot s;
+	public static Agitator agitator;
+	public static ADIS16448_IMU imu;
+	public static DriveStraightPID driveStraightPID;
+	public static DriveStraightBackwardsPID driveStraightBackwardsPID;
+	public static Square square;
+	public static Ultrasonic us;
 
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
@@ -82,7 +95,6 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		showNomral=true;
-		myGyro = new AnalogGyro(RobotMap.gyro);
 		
 		// SCOTT HOWARD - parameters will need to be adjusted. Parameters are (echo pulse, trigger pulse)
 		// So, this example uses DigitalOutput 0 as the echo pulse, and DigitalInput 0 for the trigger pulse
@@ -91,31 +103,49 @@ public class Robot extends IterativeRobot {
 		// SCOTT HOWARD - this function call simply reads the range on the sensor. Maybe print this to the screen?
 		// According to FRC, accuracy should be within 2-3 inches. Just not sure on specific numbers for the Pololu sensor.
 //		double range = myProxSensor.getRangeInches();
-		
-		myGyro.reset();
-		myGyro.setSensitivity(voltsPerDegreePerSecond);
-		myGyro.calibrate();
+		us = new Ultrasonic(6,7);
 		turn = new Turn();
 		climber = new Climber();
 		collector = new Collector();
 		shooter = new Shooter();
 		camMount = new CamMount();
 		centerPeg = new CenterPeg();
+		agitator = new Agitator();
+		imu = new ADIS16448_IMU();
+		driveStraightPID = new DriveStraightPID();
+		driveStraightBackwardsPID = new DriveStraightBackwardsPID();
 		oi = new OI();
+		//e = new Encoder(0,0);
+		
+		SmartDashboard.putData(turn);
+		SmartDashboard.putData(climber);
+		SmartDashboard.putData(collector);
+		SmartDashboard.putData(shooter);
+		SmartDashboard.putData(agitator);
+		SmartDashboard.putData(driveStraightPID);
 		
 		chooser.addDefault("Startup",new Startup());
-		chooser.addObject("Drive Forward", new DriveStraight());
+		chooser.addObject("Drive Forward", new AutoForward());
+		chooser.addObject("Place peg and stop", new AutoPlacePegAndStop());
 		chooser.addObject("Climb", new Climb(.25));
+		chooser.addObject("Square", new Square());
 		SmartDashboard.putData("Auto mode", chooser);
 		SmartDashboard.putData("climb slow",new Climb(Climb.SLOWSPEEDCLIMB));
 		SmartDashboard.putData("climb fast",new Climb(Climb.FASTSPEEDCLIMB));
 		SmartDashboard.putData("lower slow",new Climb(Climb.SLOWSPEEDLOWER));
 		SmartDashboard.putData("lower fast",new Climb(Climb.FASTSPEEDLOWER));
 		SmartDashboard.putData("Drive Forward",new DriveStraight());
-		SmartDashboard.putData("Shoot",new Shoot());
+		SmartDashboard.putData("Shoot",new Shoot(Shoot.FORWARD));
 		SmartDashboard.putData("Collect In",new Collect(Collect.FORWARD));
 		SmartDashboard.putData("Collect Out",new Collect(Collect.BACKWARD));
+		SmartDashboard.putData("Raise Arm",new RaiseArm());
+		SmartDashboard.putData("Lower Arm",new LowerArm());
+		SmartDashboard.putData("Agitate",new Agitate(Agitate.FORWARD));
 		
+		SmartDashboard.putNumber(RobotMap.agitatorSlider, 2.5);
+		SmartDashboard.putNumber(RobotMap.shooterSlider, 5);
+		SmartDashboard.putNumber(RobotMap.collectorSlider, 2.5);
+		SmartDashboard.putNumber(RobotMap.climbSlider, 2.5);
 		
 		/*
 		 * camera error code
@@ -123,18 +153,15 @@ public class Robot extends IterativeRobot {
 		 * ERROR: ioctl VIDIOC_S_CTRL failed at UsbCameraProperty.cpp:72: Input/output error (UsbUtil.cpp:122) 
 
 		 */
-		new Thread(() -> {
+		/*new Thread(() -> {
 			boolean showBad = false;
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+			//camera.setExposureManual(0);
 			camera.setResolution(640, 480);
 			camera.setExposureManual(-100);
 			camera.setBrightness(15);
 			CvSink cvSink = CameraServer.getInstance().getVideo();
-			CvSource outputStream = CameraServer.getInstance().putVideo("Otto", IMG_WIDTH, IMG_HEIGHT);
-			//if(!showNomral)
-			//{
-				
-				
+			CvSource outputStream = CameraServer.getInstance().putVideo("Otto", IMG_WIDTH, IMG_HEIGHT);	
 			Mat source = new Mat();
 			Mat output = new Mat();
 			double[] red = { 0, 255 };
@@ -286,7 +313,7 @@ public class Robot extends IterativeRobot {
 				outputStream.putFrame(source);
 
 			}
-		}).start();
+		}).start();*/
 	}
 
 	/**
@@ -317,10 +344,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {		
-		System.out.println("chooser: "+ chooser);
-		System.out.println("command: " + chooser.getSelected());
 		autonomousCommand = chooser.getSelected();
-		System.out.println("command: " + autonomousCommand);
 		
 		/* SCOTT HOWARD
 		int command = 0;
@@ -345,7 +369,6 @@ public class Robot extends IterativeRobot {
 		if (autonomousCommand != null)
 		{
 			autonomousCommand.start();
-			System.out.println("\t We got inside");
 			
 		}
 	}
@@ -374,6 +397,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		SmartDashboard.putNumber("Angle", imu.getAngleX());
 		Scheduler.getInstance().run();
 	}
 
@@ -534,3 +558,5 @@ public class Robot extends IterativeRobot {
 		return (maxY - minY) * (maxX - minX * 1.0);
 	}
 }
+
+

@@ -12,9 +12,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Shoot extends Command {
 	public static int FORWARD = 1;
 	public static int BACKWARD = -1;
+	private int direction;
 	
-    public Shoot() {
+    public Shoot(int direction) {
         requires(Robot.shooter);
+        this.direction=direction;
     }
 
     // Called just before this Command runs the first time
@@ -24,7 +26,7 @@ public class Shoot extends Command {
     // Called repeatedly when this Command is scheduled to run
     
     public void execute() {
-    	double speed = SmartDashboard.getNumber(RobotMap.shooterSlider, 2.5);
+    	double speed = direction*SmartDashboard.getNumber(RobotMap.shooterSlider, 2.5);
 		Robot.shooter.setSpeed(-1*speed/5.0);
 		SmartDashboard.putNumber("shooterr Speed", speed/5.0);
     }

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team5684.robot.Robot;
 import org.usfirst.frc.team5684.robot.RobotMap;
@@ -54,7 +55,13 @@ public class DriveTrain extends Subsystem {
 	}
 	
 	public void arcadeDrive(Joystick joy) {
+		//SmartDashboard.putNumber("Rez Angle", myGyro.getAngle());
 		drive.arcadeDrive(forward*joy.getRawAxis(5),-1*forward*joy.getRawAxis(4),true);
+	}
+	
+	public void arcadeDrive(double one, double two) {
+		//SmartDashboard.putNumber("Rez Angle", myGyro.getAngle());
+		drive.arcadeDrive(one, two);
 	}
 	
 	public void switchForward()

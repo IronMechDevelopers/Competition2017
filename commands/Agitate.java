@@ -9,16 +9,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class Collect extends Command {
-	
+public class Agitate extends Command {
+
 	public static int FORWARD = 1;
 	public static int BACKWARD = -1;
-	int direction;
+	private int direction;
 	
-    public Collect(int direction) {
+    public Agitate(int direction) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(Robot.collector);
+    	requires(Robot.agitator);
     	this.direction=direction;
     }
 
@@ -28,10 +28,9 @@ public class Collect extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double speed = SmartDashboard.getNumber(RobotMap.collectorSlider, 2.5);
-		Robot.collector.setSpeed(speed/5.0*direction);
-		SmartDashboard.putNumber("collector Speed", speed);
-    	
+    	double speed = direction*SmartDashboard.getNumber(RobotMap.agitatorSlider, 2.5);
+		SmartDashboard.putNumber("agitator Speed", speed/5.0);
+    	Robot.agitator.agitate(speed/5.0);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -41,11 +40,12 @@ public class Collect extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+    	Robot.agitator.stop();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	Robot.collector.stop();
+    	end();
     }
 }
