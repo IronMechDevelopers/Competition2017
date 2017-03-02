@@ -3,6 +3,8 @@ package org.usfirst.frc.team5684.robot.commands;
 import org.usfirst.frc.team5684.robot.Robot;
 import org.usfirst.frc.team5684.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,7 +30,8 @@ public class Shoot extends Command {
     public void execute() {
     	double speed = direction*SmartDashboard.getNumber(RobotMap.shooterSlider, 2.5);
 		Robot.shooter.setSpeed(-1*speed/5.0);
-		SmartDashboard.putNumber("shooterr Speed", speed/5.0);
+		SmartDashboard.putNumber(RobotMap.shooterSlider, speed);
+
     }
 
     // Make this return true when this Command no longer needs to run execute()

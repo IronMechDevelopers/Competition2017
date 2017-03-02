@@ -2,6 +2,7 @@ package org.usfirst.frc.team5684.robot.triggers;
 
 import org.usfirst.frc.team5684.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 

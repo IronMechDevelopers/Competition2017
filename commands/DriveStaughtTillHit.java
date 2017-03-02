@@ -3,17 +3,16 @@ package org.usfirst.frc.team5684.robot.commands;
 import org.usfirst.frc.team5684.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
-public class DriveStraight extends Command {
-    public DriveStraight() {
+public class DriveStaughtTillHit extends Command {
+
+    public DriveStaughtTillHit() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.drivetrain);
-    	
     }
 
     // Called just before this Command runs the first time
@@ -21,7 +20,6 @@ public class DriveStraight extends Command {
     	Robot.drivetrain.tankDrive(0, 0);
 		Robot.driveStraightPID.setSetpoint(Robot.imu.getAngleX());
 		Robot.driveStraightPID.enable();
-
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -30,7 +28,7 @@ public class DriveStraight extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	return false || isTimedOut();
+    	return false || isTimedOut() || Robot.imu.getAccelX()<0;
     }
 
     // Called once after isFinished returns true

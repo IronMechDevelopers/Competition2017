@@ -1,8 +1,10 @@
 package org.usfirst.frc.team5684.robot.commands;
 
+import org.usfirst.frc.team5684.robot.OI;
 import org.usfirst.frc.team5684.robot.Robot;
 import org.usfirst.frc.team5684.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,15 +24,20 @@ public class Collect extends Command {
     	this.direction=direction;
     }
 
-    // Called just before this Command runs the first time
+    public Collect(int direction, double d) {
+		Robot.collector.setSpeed(-1*d*direction);
+		SmartDashboard.putNumber("collector Speed", d);
+	}
+
+	// Called just before this Command runs the first time
     protected void initialize() {
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double speed = SmartDashboard.getNumber(RobotMap.collectorSlider, 2.5);
+    	double speed = new Joystick(1).getRawAxis(1)*5.0;
 		Robot.collector.setSpeed(speed/5.0*direction);
-		SmartDashboard.putNumber("collector Speed", speed);
+		SmartDashboard.putNumber("collector Speed", Math.abs(speed/5.0*direction));
     	
     }
 

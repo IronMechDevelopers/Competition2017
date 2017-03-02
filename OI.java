@@ -13,14 +13,12 @@ import org.usfirst.frc.team5684.robot.commands.DriveStraight;
 import org.usfirst.frc.team5684.robot.commands.Everything;
 import org.usfirst.frc.team5684.robot.commands.Flip;
 import org.usfirst.frc.team5684.robot.commands.FollowPeg;
-import org.usfirst.frc.team5684.robot.commands.IRSensor;
 import org.usfirst.frc.team5684.robot.commands.IncreaseShooterSpeed;
 import org.usfirst.frc.team5684.robot.commands.LowerArm;
 import org.usfirst.frc.team5684.robot.commands.RaiseArm;
 import org.usfirst.frc.team5684.robot.commands.Shoot;
 import org.usfirst.frc.team5684.robot.commands.ShootWithAgitate;
 import org.usfirst.frc.team5684.robot.commands.Square;
-import org.usfirst.frc.team5684.robot.commands.SwitchForward;
 import org.usfirst.frc.team5684.robot.commands.ZeroCamera;
 import org.usfirst.frc.team5684.robot.triggers.BackwardButton;
 import org.usfirst.frc.team5684.robot.triggers.ForwardButton;
@@ -45,6 +43,7 @@ public class OI {
 	// You create one by telling it which joystick it's on and which button
 	// number it is.
 	 Joystick joystick = new Joystick(0);
+	 Joystick stick = new Joystick(1);
 	 Button xButton = new ForwardButton(joystick,RobotMap.leftTrigger,RobotMap.xButton);
 	 Button xBackButton = new BackwardButton(joystick,RobotMap.leftTrigger,RobotMap.xButton);
 	 
@@ -65,6 +64,22 @@ public class OI {
 	 
 	 Button RightTrigger = new RightTrigger(joystick);
 	 Button BothTriggers = new BothTriggers(joystick);
+	 
+	 Button fire = new JoystickButton(stick,1);
+	 Button thumb = new JoystickButton(stick,2);
+	 
+	 Button JSShoot = new JoystickButton(stick,1);
+	 Button button7 = new JoystickButton(stick,7);
+	 
+	 Button button3 = new JoystickButton(stick,3);
+	 Button button4 = new JoystickButton(stick,4);
+	 Button button5 = new JoystickButton(stick,5);
+	 Button button6 = new JoystickButton(stick,6);
+	 
+	 Button button8 = new JoystickButton(stick,8);
+	 Button button9 = new JoystickButton(stick,9);
+	 Button button10 = new JoystickButton(stick,10);
+	 Button button2 = new JoystickButton(stick,2);
 	 
 	 
 	
@@ -99,7 +114,6 @@ public class OI {
 			xButton.whileHeld(new ShootWithAgitate());
 			xBackButton.whileHeld(new Shoot(Shoot.BACKWARD));
 			
-			aButton.whileHeld(new DriveStraight());
 			aBackButton.whenPressed(new Square());
 			
 			
@@ -110,17 +124,28 @@ public class OI {
 			rightBackBumper.whileHeld(new Collect(Collect.BACKWARD));
 			
 			yButton.whenPressed(new IncreaseShooterSpeed());
-			yBackButton.whenPressed(new DecreaseShooterSpeed());
+			aButton.whenPressed(new DecreaseShooterSpeed());
 			
 			RightTrigger.whileHeld(new Climb(Climb.SLOWSPEEDCLIMB));
 			bButton.whileHeld(new Climb(Climb.SLOWSPEEDLOWER));
 			BothTriggers.whileHeld(new ClimbFaster());
 			
+			JSShoot.toggleWhenPressed(new ShootWithAgitate());
+			button7.whenPressed(new IncreaseShooterSpeed());
+			button8.whenPressed(new DecreaseShooterSpeed());
 			
-			/*aButton.whenPressed(new AutoForward());
-			xButton.whenPressed(new AutoPlacePegAndStop());
-			yButton.whenPressed(new AutoPlacePegAndRed());
-			*/
+			button9.toggleWhenPressed(new Collect(Collect.FORWARD));
+			button10.toggleWhenPressed(new Collect(Collect.BACKWARD));
+			
+			//button9.whileHeld(new Collect(Collect.FORWARD,stick.getRawAxis(1)/1.0));
+			
+			button2.whileHeld(new Climb(Climb.SLOWSPEEDCLIMB));
+			
+			button3.whileHeld(new Climb(Climb.SLOWSPEEDCLIMB));
+			button5.whileHeld(new ClimbFaster());
+			
+			button6.whileHeld(new Climb(Climb.SLOWSPEEDLOWER));
+			
 			
 		}
 		

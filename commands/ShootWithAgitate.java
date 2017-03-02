@@ -1,5 +1,6 @@
 package org.usfirst.frc.team5684.robot.commands;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 
@@ -26,6 +27,7 @@ public class ShootWithAgitate extends CommandGroup {
         // a CommandGroup containing them would require both the chassis and the
         // arm.
     	addParallel(new Shoot(Shoot.FORWARD));
+    	addParallel(new Rummble());
     	addSequential(new WaitCommand(3));
     	addParallel(new Agitate(Agitate.FORWARD));
     }

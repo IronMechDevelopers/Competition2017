@@ -18,7 +18,7 @@ public class RobotMap {
 	public static int collector=3;
 	public static int cameraBottom=9;
 	public static int cameraTop=8;
-	public static String shooterSlider ="DB/Slider 0";
+	public static String shooterSlider ="Shooter Speed";
 	public static String collectorSlider="DB/Slider 1";
 	public static String climbSlider = "DB/Slider 2";
 	public static String agitatorSlider = "DB/Slider 3";

@@ -24,24 +24,24 @@ import edu.wpi.first.wpilibj.command.Command;
 public class DriveTrain extends Subsystem {
 	// Subsystem devices
 	private static RobotDrive drive;
-	public static int forward =1;
-	//private AnalogGyro gyro = Robot.myGyro;
+	public static int forward = 1;
+	// private AnalogGyro gyro = Robot.myGyro;
 
 	public DriveTrain() {
 		// Configure drive motors
 		// Configure the RobotDrive to reflect the fact that all our motors are
 		// wired backwards and our drivers sensitivity preferences.
-		drive = new RobotDrive(RobotMap.leftWheels,RobotMap.rightWheels);
-		drive.setSafetyEnabled(true);
-		drive.setExpiration(0.1);
-		drive.setSensitivity(0.5);
-		drive.setMaxOutput(1.0);
+		drive = new RobotDrive(RobotMap.leftWheels, RobotMap.rightWheels);
+		//drive.setSafetyEnabled(true);
+		//drive.setExpiration(0.1);
+		//drive.setSensitivity(0.5);
+		//drive.setMaxOutput(1.0);
 
 		// Configure gyro
 		if (Robot.isReal()) {
-			//gyro.setSensitivity(0.007); // TODO: Handle more gracefully?
+			// gyro.setSensitivity(0.007); // TODO: Handle more gracefully?
 		}
-		//LiveWindow.addSensor("DriveTrain", "Gyro", gyro);
+		// LiveWindow.addSensor("DriveTrain", "Gyro", gyro);
 	}
 
 	/**
@@ -51,34 +51,17 @@ public class DriveTrain extends Subsystem {
 	@Override
 	public void initDefaultCommand() {
 		setDefaultCommand(new DriveWithJoystick());
-		drive.setSafetyEnabled(false);
+		//drive.setSafetyEnabled(false);
 	}
-	
+
 	public void arcadeDrive(Joystick joy) {
-		//SmartDashboard.putNumber("Rez Angle", myGyro.getAngle());
-		drive.arcadeDrive(forward*joy.getRawAxis(5),-1*forward*joy.getRawAxis(4),true);
+		 drive.arcadeDrive(forward*joy.getRawAxis(5),-1*forward*joy.getRawAxis(4),true);
 	}
 	
 	public void arcadeDrive(double one, double two) {
-		//SmartDashboard.putNumber("Rez Angle", myGyro.getAngle());
-		drive.arcadeDrive(one, two);
-	}
-	
-	public void switchForward()
-	{
-		if(forward==1)
-			forward=-1;
-		else
-			forward=1;
+		 drive.arcadeDrive(one, two);
 	}
 
-	/**
-	 * @param joy
-	 *            PS3 style joystick to use as the input for tank drive.
-	 */
-	public void tankDrive(Joystick joy) {
-		drive.tankDrive(joy.getY(), joy.getX(),true);
-	}
 
 	/**
 	 * @param leftAxis
@@ -88,6 +71,13 @@ public class DriveTrain extends Subsystem {
 	 */
 	public void tankDrive(double leftAxis, double rightAxis) {
 		drive.tankDrive(leftAxis, rightAxis);
+	}
+
+	public void RadTestDrive(Joystick joy) {
+		if (Math.abs(joy.getZ()) < .2)
+			drive.arcadeDrive(joy.getY(), joy.getX(), true);
+		else
+			drive.arcadeDrive(0, -1*joy.getZ());
 	}
 
 	/**
@@ -100,11 +90,11 @@ public class DriveTrain extends Subsystem {
 	/**
 	 * @return The current angle of the drivetrain.
 	 */
-	//public double getAngle() {
-		//return gyro.getAngle();
-	//}
+	// public double getAngle() {
+	// return gyro.getAngle();
+	// }
 
 	public static void turn(double d) {
-		drive.arcadeDrive(0, d); 	
+		drive.arcadeDrive(0, d);
 	}
 }

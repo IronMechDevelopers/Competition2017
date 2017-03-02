@@ -12,6 +12,7 @@ public class AutoForward extends CommandGroup {
 
     public AutoForward() {
     	addSequential(new DriveStraight(),2.75);
+    	addParallel(new ReleaseGear());
     	addSequential(new Stop(),1);
     }
 

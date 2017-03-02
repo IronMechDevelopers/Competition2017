@@ -35,7 +35,7 @@ public class IncreaseShooterSpeed extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	SmartDashboard.putNumber(RobotMap.shooterSlider, temp*1.05);
+    	SmartDashboard.putNumber(RobotMap.shooterSlider, temp+.05);
     }
 
     // Called when another command which requires one or more of the same

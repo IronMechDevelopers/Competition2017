@@ -24,7 +24,7 @@ public class DriveWithJoystick extends Command {
 	}
 
 	@Override
-	protected void end() {
+	protected  void end() {
 		Robot.drivetrain.stop();
 	}
 }
